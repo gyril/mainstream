@@ -64,8 +64,7 @@ def register(request):
 
         if form.is_valid():
             new_profil = form.save(commit=False)
-            avatar = form.cleaned_data['avatar']
-            #print form.data
+            print form.data
             new_profil.save()
             request.user.is_active=True
             request.user.save()
@@ -94,7 +93,7 @@ def login_view(request):
 	    return HttpResponseRedirect("/")
         else:
 	# Redirects to login page with message error if user did not match password
-            return render_to_response("/")
+            return render_to_response("register.html", {'login_error': True, 'form': MyUserCreationForm(), 'register': False})
     else:
         return HttpResponseRedirect("/")
 

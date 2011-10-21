@@ -12,15 +12,21 @@ from mnt.views_users import register, login_view
 
 
 urlpatterns = patterns('',
-#Home page (MaiNsTream + Login )
-	url(r'^$', home),
-	# gestion redirection post login	
 	url(r'^login/$', login_view),
+	url(r'^$', home),
 # Afficher plus dans la timeline
 	url(r'^more/(?P<more>\d{1,2})/$', home),
-#Formulaire d'inscription
 	url(r'^registration/$', register),
 #Afficher la confirmation de logout
 	url(r'^logout/$', logout, {'next_page':'/'}),
-)
 
+    # Examples:
+    # url(r'^$', 'rchc.views.home', name='home'),
+    # url(r'^rchc/', include('rchc.foo.urls')),
+
+    # Uncomment the admin/doc line below to enable admin documentation:
+    # url(r'^admin/doc/', include('django.contrib.admindocs.urls')),
+
+    # Uncomment the next line to enable the admin:
+    # url(r'^admin/', include(admin.site.urls)),
+)

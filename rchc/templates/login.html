@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+
+{% block titre %}
+Join the MaiNsTream 
+{% endblock %}
+
+{% block corps %}
+<div class="content">
+	<form action="/login/" method="post">
+		<label for="username">User name:</label>
+		<input type="text" name="username" value="" id="username">
+		<label for="password">Password:</label>
+		<input type="password" name="password" value="" id="password">		
+		<br /><input type="submit" value="login" />
+		<input type="hidden" name="next_page" value="{{ request.path }}" />
+		<input type="hidden" name="register" value="False">
+		<a href="/registration/">Inscrivez-vous</a>
+	</form>
+</div>
+{% endblock %}

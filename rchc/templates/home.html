@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+
+{% block titre %}
+MaiNsTream
+{% endblock %}
+
+{% block corps %}
+
+{% block login %}
+	<img src="/static/img/icones/profil.gif" class="icone"/>
+	{% if request.user.is_authenticated %}
+                {% load static %}
+		<div class="content">
+			<img class ="icone2" src="{% if sidebar_content.avatar %}/static/{{ sidebar_content.avatar }}{% else %}/static/img/icones/anonymous.gif{% endif %}" />
+			<p><strong>Bonjour {{ request.user.username }}</strong></p>  
+			<a href='/logout/'>D&eacute;connexion</a>
+			</p>
+		</div>
+	{% else %}
+		<h3>Login :</h3>
+		<div class="content">
+			{% if form.errors %}
+   				<p class="error">Sorry, that's not a valid username or password</p>
+  			{% endif %}
+	  		{% if login_error %}
+				<p> The user name did not match the password.</p>
+			{% endif %}
+				<form action="/login/" method="post">
+					<label for="username">User name:</label>
+					<input type="text" name="username" value="" id="username">
+					<label for="password">Password:</label>
+					<input type="password" name="password" value="" id="password">		
+					<br/><input type="submit" value="login" />
+					<input type="hidden" name="next_page" value="{{ request.path }}" />
+					<input type="hidden" name="register" value="False">
+					<a href="/registration/">Inscrivez-vous</a>
+				</form>
+		</div>
+	{% endif %}
+{% endblock %}
+
+
+
+
+
+
+<div class="bloc">
+	<img src="/static/img/icones/latest.png" class="icone" />
+	<h3>Timeline</h3>
+	
+<!-- Envoyer un message -->	
+	<form action="." method="POST">
+		{{ form.mess }}
+		<div>
+			<input type="submit" value="MaiNsTream" />
+		</div>
+	</form>
+
+<!-- Affichage Timeline -->
+	{% if list_messages %}
+		{% for message in messages_timeline %}
+	                <div class="bloc_timeline"> 
+				<div>                					
+					<img class="icone" src="/static/{{ message.avatar }}" />
+                                        <p>{{message.ilya}}</p>
+					<p>Message de {{message.message.user}}</p>					
+                                </div>
+		        	<div class="mess">
+				        <h2>{{ message.message }}</h2>
+                        	</div>
+                       </div>
+		{% endfor %}
+	
+	<!-- navigation -->
+
+	<div class="more">
+		<div class="more_right">
+			{% if next %}
+				<a href="/more/{{next}}" class="next"> Next </a> 
+			{% else %} 
+				<a href="/home" class="next"> Home </a>
+			{% endif %}
+		</div>
+		<div class="more_left">
+			{% if previous %}
+				{% if next == "2" %}
+				{% else %}
+				<a href="/more/{{previous}}" class="next"> Previous </a>
+			{% endif %}
+			{% endif %}
+		</div>
+	
+	</div>
+	{% else %}
+		Pas de message pour l'instant
+	{% endif %}
+</div>
+{% endblock %}

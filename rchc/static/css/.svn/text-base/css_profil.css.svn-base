@@ -1,0 +1,49 @@
+.bloc2 {
+	border: 1px solid black;
+	margin: 1em 0;
+	background-color: #AAA;
+	float: left;
+	width: 220px;
+}
+
+.bloc2 h3 {
+	text-align: left;
+	color: #EEE;
+	margin-top: 0;
+	padding-top: 0.5em;
+	background-color: #333;
+	font-size: 0.9em;
+	font-weight: normal;
+	height: 1.8em;
+}
+
+#sidebar_profil {
+	padding-left: 0;
+	margin-left: 10px;
+	width: 220px;
+	float: left;
+	font-weight: 0.9em;
+}
+#sidebar_profil ul {
+	list-style-image: url("/static/img/icones/arrow.gif");
+	margin-left: 25px;
+	padding: 0;
+}
+.bloc2 img.icone {
+	float: left;
+	height: 40px;
+	width: 40px;
+	margin-right: 10px;
+	margin-left: 10px;
+}
+.avatar {
+	margin-left: 35px;
+}
+
+.bloc p {
+    line-height:160%;
+}
+
+.classique {
+    font-weight: normal;
+}

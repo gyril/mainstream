@@ -1,0 +1,26 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="{{ page_langue|default_if_none:"fr" }}" lang="{{ page_langue|default_if_none:"fr" }}">
+<!-- 
+- Utiliser page_langue pour changer la langue de la page 
+-->
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1"/>
+	<link rel="stylesheet" media="screen" href="/static/css/css_base.css" />
+	<link rel="stylesheet" media="screen" href="/static/css/css_header.css" />
+	<link rel="stylesheet" media="screen" href="/static/css/css_corps.css" />
+
+	{% block head %}
+	{% endblock %}
+       <title>{% block titre %}{% endblock %}</title>
+</head>
+
+<body>
+
+	
+	<div id="corps">
+		{% block corps %}
+		{% endblock %}
+	</div>
+
+</body>
+</html>

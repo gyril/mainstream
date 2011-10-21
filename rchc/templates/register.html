@@ -1,53 +1,46 @@
 {% extends "base.html" %}
 
-{% block titre %}Cr&eacute;er un compte{% endblock %}
-
-
-{% block corps %}
-
-{% if redirect %}
-
-<h1>Vous devez être logg&eacute; pour voir cette page.</h1>
-
-{% endif %}
-
-<div id="block">
-		<div id="item21" class="bloc">
-			<h3 id="id_title1" class="mytitle"> {% if form2 %} Votre compte a &eacute;t&eacute; cr&eacute;&eacute; {% else %}  Vous decouvrez BreakMyTie ? Creez-vous un compte! {% endif %} </h3>
-			<div class="mycontent">
-				{% if form %}
-				<form action="" method="post">
-					{{ form.as_p }}
-					<input type="submit" value="creer votre profil">
-					<input type="hidden" name="register" value="True">
-				</form>
-				{% endif %}
-			</div>
-		</div>
-	        {% if form2 %}
-		<div id="item22"class="bloc">
-				<h3 id="id_title2" class="mytitle">Creer votre profil</h3>
-				<div class="mycontent">
-					<form action="" method="post">
-						{{ form2.as_p }}
-						<input type="submit" value="Creer le compte">
-						<input type="hidden" name="register" value="next">
-					</form>
-					<div>
-                        <br/>
-						<p>Les champs contenant une etoile sont obligatoires.</p>
-					</div>
-				</div>
-		</div>
-		{% endif %}
-</div>
-
-
-
-
-
-  
-
-
+{% block titre %}
+	Cr&eacute;er un compte
 {% endblock %}
 
+{% block corps %}
+	{% if redirect %}
+		<h1>Vous devez être logg&eacute; pour voir cette page.</h1>
+	{% endif %}
+
+<div id="registration">
+	<h3 id="id_registrationTitle">
+		{% if form2 %} 
+			Votre compte a &eacute;t&eacute; cr&eacute;&eacute; 
+		{% else %}
+			Vous decouvrez MaiNsTream ? Creez-vous un compte! 
+		{% endif %} 
+	</h3>
+	<div class="formProfil">
+		{% if form %}
+			<form action="" method="post">
+				{{ form.as_p }}
+				<input type="submit" value="creer votre profil">
+				<input type="hidden" name="register" value="True">
+			</form>
+		{% endif %}
+	</div>
+</div>
+{% if form2 %}
+	<div id="registration">
+		<h3 id="id_registrationTitle">Creer votre profil</h3>
+		<div class="formProfil">
+			<form action="" method="post">
+				{{ form2.as_p }}
+				<input type="submit" value="Creer le compte">
+				<input type="hidden" name="register" value="next">
+			</form>
+			<div>
+				<br/>
+				<p>Les champs contenant une etoile sont obligatoires.</p>
+			</div>
+		</div>
+	</div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,11 @@
+SetEnv PHP_VER 5
+SetEnv REGISTER_GLOBALS 0
+
+Options -Indexes
+
+RewriteEngine On
+
+RewriteCond $1 !^(index\.php|public|robots\.txt)
+RewriteRule ^(.*)$ /index.php/$1 [L]
+
+AddDefaultCharset utf-8

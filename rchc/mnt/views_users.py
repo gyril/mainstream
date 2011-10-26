@@ -10,7 +10,7 @@ from mnt.models import Profil
 from django.http import HttpResponse
 import datetime
 from django.conf import settings
-
+from django.contrib.auth import authenticate, login
 
 
 def register(request):
@@ -83,32 +83,18 @@ def register(request):
 			return render_to_response("register.html", locals())
 
 
-
-
-
 def login_view(request):
-    if request.method == 'POST' and request.POST.get('register', '')=='False':
-        #assert False
-        username = request.POST.get('username', '')
-        password = request.POST.get('password', '')
-        user = auth.authenticate(username=username, password=password)
-        auth.login(request, user)
-        if user is not None and user.is_active:
-            # Correct password, and the user is marked "active"
-            # Redirect to a success page.
-            return HttpResponseRedirect(page_to_redirect)
-
-        elif user is not None and not user.is_active:
-                #Correct password but profil not completed
-            return HttpResponseRedirect("/")
-
+    username = request.POST['username']
+    password = request.POST['password']
+    user = authenticate(username=username, password=password)
+    if user is not None:
+        if user.is_active:
+            login(request, user)
+	    return HttpResponseRedirect("/")
         else:
-            
-            # Redirects to login page with message error if user did not match password
+	# Redirects to login page with message error if user did not match password
             return render_to_response("register.html", {'login_error': True, 'form': MyUserCreationForm(), 'register': False})
     else:
-        return HttpResponseRedirect("/login")
+        return HttpResponseRedirect("/")
 
-
-	
 

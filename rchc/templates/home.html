@@ -17,33 +17,6 @@ MaiNsTream
 			<a href='/logout/'>D&eacute;connexion</a>
 			</p>
 		</div>
-	{% else %}
-		<h3>Login :</h3>
-		<div class="content">
-			{% if form.errors %}
-   				<p class="error">Sorry, that's not a valid username or password</p>
-  			{% endif %}
-	  		{% if login_error %}
-				<p> The user name did not match the password.</p>
-			{% endif %}
-				<form action="/login/" method="post">
-					<label for="username">User name:</label>
-					<input type="text" name="username" value="" id="username">
-					<label for="password">Password:</label>
-					<input type="password" name="password" value="" id="password">		
-					<br/><input type="submit" value="login" />
-					<input type="hidden" name="next_page" value="{{ request.path }}" />
-					<input type="hidden" name="register" value="False">
-					<a href="/registration/">Inscrivez-vous</a>
-				</form>
-		</div>
-	{% endif %}
-{% endblock %}
-
-
-
-
-
 
 <div class="bloc">
 	<img src="/static/img/icones/latest.png" class="icone" />
@@ -96,4 +69,32 @@ MaiNsTream
 		Pas de message pour l'instant
 	{% endif %}
 </div>
+	{% else %}
+		<h3>Login :</h3>
+		<div class="content">
+			{% if form.errors %}
+   				<p class="error">Sorry, that's not a valid username or password</p>
+  			{% endif %}
+	  		{% if login_error %}
+				<p> The user name did not match the password.</p>
+			{% endif %}
+				<form action="/login/" method="post">
+					<label for="username">User name:</label>
+					<input type="text" name="username" value="" id="username">
+					<label for="password">Password:</label>
+					<input type="password" name="password" value="" id="password">		
+					<br/><input type="submit" value="login" />
+					<input type="hidden" name="next_page" value="{{ request.path }}" />
+					<input type="hidden" name="register" value="False">
+					<a href="/registration/">Inscrivez-vous</a>
+				</form>
+		</div>
+	{% endif %}
 {% endblock %}
+
+{% endblock %}
+
+
+
+
+

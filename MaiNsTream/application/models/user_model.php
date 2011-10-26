@@ -148,7 +148,6 @@ class User_Model extends CI_Model
 			
 			$this->session->set_userdata('id_user', $user->id_user);
 			$this->session->set_userdata('nickname', $user->nickname);
-			
 			return true;
 		}
 		

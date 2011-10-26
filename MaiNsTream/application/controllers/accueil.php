@@ -38,6 +38,7 @@ class Accueil extends CI_Controller {
 		$headers['title'] = "MaiNsTream - MNT only";
 		$this->load->view('head', $headers);
 		$this->load->view('accueil');
+		$this->load->view('footer');
 		
 	}
 }

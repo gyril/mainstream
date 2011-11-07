@@ -19,6 +19,7 @@
 		curl_setopt ($c, CURLOPT_RETURNTRANSFER, true);
 		$page = curl_exec ($c);
 		curl_close ($c);
-		echo utf8_decode(stripslashes($page));
+//		header('Content-type: text/html; charset=UTF-8', true);
+		echo stripslashes($page);
     }
 ?>

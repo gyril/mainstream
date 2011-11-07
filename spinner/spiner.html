@@ -2,7 +2,7 @@
 	<head>
 		<meta http-equiv="content-type" content="text/html; charset=utf-8" />
 		<title>MNT Spinner</title>
-
+		<link rel="stylesheet" type="text/css" media="screen" href="atd.css" />
 		<style type="text/css">
 			#wrapper {
 				width:500px;
@@ -51,12 +51,18 @@
 		</style>
 
 		<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js"></script>
+		<script src="jquery.atd.js"></script>
+		<script src="jquery.atd.textarea.js"></script>
+		<script src="csshttprequest.js"></script>
 		<script type="text/javascript">
+		var liens = ["http://www.google.fr/", "http://www.facebook.com", "http://www.twitter.com/"];
 		var cliques = [];
 		var strTemp = "Entrez le texte original ici.";
+		var numlien=0;
 
 		function insertClique() {
 			var selection = $("#id_selection").val();
+			var regselection = new RegExp(selection, 'gi');
 		    var pattern = "{";
 		    var clique = getClique();
 		    for(var i in clique){
@@ -64,7 +70,7 @@
 		    }
 		    pattern=pattern.substr(0,pattern.length-1);
 		    pattern+= "}";
-		    strTemp = strTemp.replace(selection,pattern,"gi");
+		    strTemp = strTemp.replace(regselection,pattern);
 		    $("#id_texte").val(strTemp);
 		    $("#id_modif").click();
 		    $("#id_texte").blur();
@@ -117,6 +123,18 @@
 		    });
 		}
 		
+		function link() {
+			var select = $("#id_selection").val();
+			var linked = '<a href="numlien'+numlien+'">'+select+'</a>';
+			var regselect = new RegExp(select, 'gi');
+			strTemp = strTemp.replace(regselect,linked);
+			numlien++;
+		    $("#id_texte").val(strTemp);
+		    $("#id_modif").click();
+		    $("#id_texte").blur();
+			
+		}
+		
 		function spin() {
 			$.post("xhr.php", { texte: strTemp}, function(data) {
 				var resultat = data.split("Outil Content Spinning</h1>");
@@ -124,6 +142,31 @@
 				var output = "<h2>Texte 1</h2>"+data[0];
 				$("#id_resultats").hide();
 				$("#id_textes").html(output).show();
+				var texte = "";
+				$("#id_textes textarea").each(function() {
+					texte += $(this).text() + " \r\n\r\n";
+				});
+				for (i=0 ; i<(numlien) ; i++) {
+					var link = new RegExp("numlien"+i, 'gi');
+					texte = texte.replace(link,liens[i]);
+				}
+				$("#id_textes").html('<div style="width:500px;height:600px;margin:0 auto;" id="tout">'+texte+'</div');
+				AtD.checkCrossAJAX("tout",
+				{
+					success : function(errorCount) 
+			       {
+			          if (errorCount == 0)
+			          {
+			             alert("No writing errors were found");
+			          }
+			          $("#id_textes").prepend('<textarea style="width:500px;height:600px;display:block;margin:0 auto">'+texte+'</textarea>');
+			       },
+
+			       error : function(reason)
+			       {
+			          alert(reason);
+			       }
+				});
 			});
 		}
 		
@@ -134,6 +177,7 @@
 	
 		<script>
 	$(document).ready(function() {
+		AtD.rpc_css_lang = "fr";
         $("#onBlur").hide();
         $("#id_texte").val(strTemp).blur(function() {
         	if($(this).val()=="")
@@ -193,6 +237,7 @@
 	   			<div style="clear:both">
 		    		<input id="id_selection" type="text" />
     				<input type="button" value="cliques" onclick="getCliques()" />
+    				<input type="button" value="link" onclick="link()" />
     				<div id="id_resultats">
 	    			</div>
 				</div>

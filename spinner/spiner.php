@@ -55,7 +55,14 @@
 		<script src="jquery.atd.textarea.js"></script>
 		<script src="csshttprequest.js"></script>
 		<script type="text/javascript">
-		var liens = ["http://www.google.fr/", "http://www.facebook.com", "http://www.twitter.com/"];
+		var liens = [<?php 
+		$text = file('lien');
+		shuffle($text);
+		foreach($text as $line) {
+			echo "'" . rtrim($line) . "',";
+		}
+		echo "];";
+		?>
 		var cliques = [];
 		var strTemp = "Entrez le texte original ici.";
 		var numlien=0;
@@ -169,6 +176,16 @@
 				});
 			});
 		}
+
+		function addURL() {
+			var url = $("#id_url").val();	
+			$.ajax({
+		      		url: "url.php?select="+url,
+			      	success: function(data){
+				$("#id_url").val(data);
+			      	}
+		    	});
+		}
 		
 		
 		</script>
@@ -224,6 +241,11 @@
 		
 		<div id="wrapper">
 			<p style="font: 30pt Inconsolata, Helvetica, Arial;text-align: center;text-shadow: 0 -1px steelblue;color: lightblue;">MNT Fatal Spinner v0.1</p>
+			<div id="id_linker">	
+				<input type="text" id="id_url" value="Ajouter l'URL de votre dernier post" style="width:500px;margin:0 auto;"></textarea>
+	   			<input type="button" value="Add" onclick="addURL()" style="float:right;" />
+			</div>
+			<br>
 			<textarea id="id_texte"></textarea>
 			<br>
    			<input type="button" value="OK" onclick="$('#id_texte').blur()" id="id_blur" style="display:block;margin:0 auto;" />

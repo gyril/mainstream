@@ -1,4 +1,5 @@
 <?php
+
 	$selection = strtolower($_GET['select']);
 	$texte = $_POST['texte'];
 	

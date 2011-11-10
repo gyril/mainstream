@@ -40,15 +40,15 @@
 				    return false;
 				},
 				
-				mouseup: function() {
+				mouseup: function () {
 					Map.drag = false;
 				},
 				
-				mouseout: function() {
+				mouseout: function () {
 					Map.drag = false;
 				},
 				
-				keypress: function(e) {
+				keypress: function (e) {
 					if(Map.selection) {
 						switch(e.keyCode)
 						{
@@ -61,9 +61,23 @@
 							case 8:
 								if(Map.selection.edit)
 									Map.selection.setLabel(Map.selection.label.substr(0,Map.selection.label.length-1));
+								else
+									Map.selection.dropNode();
 								break;
 							case 9:
-								Map.setSelection(Map.selection.children[0]);
+								Map.setSelection(Map.selection.getChild());
+								break;
+							case 37:
+								Map.setSelection(Map.selection.getParent());
+								break;
+							case 39:
+								Map.setSelection(Map.selection.getChild());
+								break;
+							case 38:
+								Map.setSelection(Map.selection.getUpper());
+								break;
+							case 40:
+								Map.setSelection(Map.selection.getDowner());
 								break;
 							default:
 								if((e.keyCode>47 && e.keyCode<91) || e.keyCode==32) {
@@ -83,7 +97,7 @@
 					Map.draw();
 				},
 				
-				mousemove: function(e) {
+				mousemove: function (e) {
 					var pos = Map.getMousePos(e);
 					var nx = pos[0] - Map.mousePos[0];
 					var ny = pos[1] - Map.mousePos[1];
@@ -107,7 +121,7 @@
 					Map.draw();	
 				},
 				
-				draw: function() {
+				draw: function () {
 
 					context.clearRect(0,0,canvas.width,canvas.height);
 
@@ -119,7 +133,7 @@
 				    Map.nodes.reverse();
 				},
 				
-				getMousePos: function(e) {
+				getMousePos: function (e) {
 					
 					var x;
 					var y;
@@ -136,7 +150,7 @@
 					return [x,y];
 				},
 				
-				setSelection: function(obj, evt) {
+				setSelection: function (obj, evt) {
 					
 					for (i in Map.nodes) {
 				        node = Map.nodes[i];
@@ -163,7 +177,7 @@
 					return "#"+red.toString(16)+green.toString(16)+blue.toString(16);
 				},
 				
-				Node: function(parent) {
+				Node: function (parent) {
 					
 				    if(parent != undefined) {
 				    	//initialize child node
@@ -204,12 +218,12 @@
 				}
 			}
 			
-			Map.Node.prototype.setLabel = function(newLabel) {
+			Map.Node.prototype.setLabel = function (newLabel) {
 				this.label = newLabel;
 			    this.w = this.label.length*10 + 20;
 			}
 			
-			Map.Node.prototype.nextSibling = function() {
+			Map.Node.prototype.nextSibling = function () {
 				if(this.root) return undefined;
 				
 				for (var i in this.parent.children) {
@@ -218,7 +232,7 @@
 				}				
 			}
 			
-			Map.Node.prototype.draw = function(ctx) {
+			Map.Node.prototype.draw = function (ctx) {
 				
 				if(this.root) {
 					
@@ -284,7 +298,7 @@
 		    
 		    }
 			
-			Map.Node.prototype.nextSibling = function() {
+			Map.Node.prototype.nextSibling = function () {
 				
 				if(this.root) return undefined;
 		    	
@@ -292,6 +306,65 @@
 		    		if(this === this.parent.children[i])
 	    				return this.parent.children[parseInt(i)+1];
 		    	}
+			}
+			
+			Map.Node.prototype.dropNode = function () {
+				var num = Map.nodes.indexOf(this);
+				Map.nodes.splice(num, 1);
+				for(i in this.children) {
+					var child = this.children[i];
+					child.parent = this.parent;
+					this.parent.children.push(child);
+				}
+				num = this.parent.children.indexOf(this);
+				this.parent.children.splice(num, 1);
+				delete this;
+			}
+			
+			Map.Node.prototype.getParent = function () {
+				return this.parent;
+			}
+
+			Map.Node.prototype.getChild = function () {
+				if (this.children.length)
+					return this.children[0];
+				return this;
+			}
+			
+			Map.Node.prototype.getUpper = function () {
+				var min = false;
+				var closer = this;
+				
+				for(i in this.parent.children) {
+					sibling = this.parent.children[i];
+					if(sibling != this && sibling.y < this.y) {
+						var diff = this.y - sibling.y;
+						if(!min || diff < min) {
+							min = diff;
+							closer = sibling;
+						}
+					}
+				}
+				
+				return closer;
+			}
+
+			Map.Node.prototype.getDowner = function () {
+				var min = false;
+				var closer = this;
+				
+				for(i in this.parent.children) {
+					sibling = this.parent.children[i];
+					if(sibling != this && this.y < sibling.y) {
+						var diff = sibling.y - this.y;
+						if(!min || diff < min) {
+							min = diff;
+							closer = sibling;
+						}
+					}
+				}
+				
+				return closer;
 			}
 		</script>
 	</head>

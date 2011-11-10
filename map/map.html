@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<!-- Always force latest IE rendering engine (even in intranet) & Chrome Frame
+		Remove this if you use the .htaccess -->
+		<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+		<title>Map</title>
+		<meta name="description" content="map your mind, save it, share it" />
+<!--		<meta name="viewport" content="width=device-width; initial-scale=1.0" />
+		<link rel="shortcut icon" href="/favicon.ico" />
+		<link rel="apple-touch-icon" href="/apple-touch-icon.png" /> -->
+		<script type="text/javascript">
+			var Map = {
+				nodes: [],
+				selection: false,
+				drag: false,
+				mousePos: [0,0],
+				selectColor: "lightblue",
+				
+				click: function(e) {
+					var pos = Map.getMousePos(e);
+					var node = Map.locateClick(pos[0], pos[1]);
+					
+					if(node) {
+						canvas.addEventListener("mousemove", Map.mousemove, false);
+						Map.mousePos = pos;
+					}
+					
+					Map.setSelection(node, "click");
+				},
+				
+				locateClick: function(x,y) {
+
+					for (i in Map.nodes) {
+				        node = Map.nodes[i];
+				        if( node.x-node.w/2 < x && x < node.x+node.w/2 && node.y-node.h/2 < y && y < node.y+node.h/2 )
+				        	return node;
+				    }
+				    return false;
+				},
+				
+				mouseup: function() {
+					Map.drag = false;
+				},
+				
+				mouseout: function() {
+					Map.drag = false;
+				},
+				
+				keypress: function(e) {
+					if(Map.selection) {
+						switch(e.keyCode)
+						{
+							case 13:
+								if(Map.selection.edit)
+									Map.selection.edit = false;
+								else
+									var node = new Map.Node(Map.selection);
+								break;
+							case 8:
+								if(Map.selection.edit)
+									Map.selection.setLabel(Map.selection.label.substr(0,Map.selection.label.length-1));
+								break;
+							case 9:
+								Map.setSelection(Map.selection.children[0]);
+								break;
+							default:
+								if((e.keyCode>47 && e.keyCode<91) || e.keyCode==32) {
+									if(Map.selection.edit) {
+										Map.selection.setLabel(Map.selection.label+String.fromCharCode(e.keyCode).toLowerCase());
+									} else {
+										Map.selection.edit = true;
+										Map.selection.setLabel(String.fromCharCode(e.keyCode));
+									}
+								}
+								break;
+						}
+					} else {
+						
+					}
+					
+					Map.draw();
+				},
+				
+				mousemove: function(e) {
+					var pos = Map.getMousePos(e);
+					var nx = pos[0] - Map.mousePos[0];
+					var ny = pos[1] - Map.mousePos[1];
+					
+					var drag = Map.drag;
+					
+					while(drag) {
+						drag.x += nx;
+						drag.y += ny;
+						
+						if(drag.children.length) {
+							drag = drag.children[0];
+						} else {
+							while(drag.nextSibling()==undefined && drag != Map.drag)
+								drag = drag.parent;
+							drag = ( drag==Map.drag ) ? false : drag.nextSibling();
+						}
+					}
+					
+					Map.mousePos = pos;
+					Map.draw();	
+				},
+				
+				draw: function() {
+
+					context.clearRect(0,0,canvas.width,canvas.height);
+
+					Map.nodes.reverse();
+				    for (i in Map.nodes) {
+				        node = Map.nodes[i];
+				        node.draw(context);
+				    }
+				    Map.nodes.reverse();
+				},
+				
+				getMousePos: function(e) {
+					
+					var x;
+					var y;
+					if (e.pageX || e.pageY) { 
+					  x = e.pageX;
+					  y = e.pageY;
+					}
+					else { 
+					  x = e.clientX + document.body.scrollLeft + document.documentElement.scrollLeft; 
+					  y = e.clientY + document.body.scrollTop + document.documentElement.scrollTop; 
+					} 
+					x -= canvas.offsetLeft+2;
+					y -= canvas.offsetTop+2;
+					return [x,y];
+				},
+				
+				setSelection: function(obj, evt) {
+					
+					for (i in Map.nodes) {
+				        node = Map.nodes[i];
+				        if(node == obj) {
+				        	node.select = true;
+				        	Map.selection = node;
+				        	if(evt == "click")
+				        		Map.drag = node;
+				        } else {
+				        	node.select = false;
+				        	node.edit = false;
+				        }
+				    }
+				    
+				    Map.draw();
+				},
+				
+				generateColor: function() {
+
+					var red = Math.floor(Math.random()*256);
+					var green = Math.floor(Math.random()*256);
+					var blue = Math.floor(Math.random()*256);
+					
+					return "#"+red.toString(16)+green.toString(16)+blue.toString(16);
+				},
+				
+				Node: function(parent) {
+					
+				    if(parent != undefined) {
+				    	//initialize child node
+				    	
+				    	this.root = false;
+	    	    		this.parent = parent;
+		        		parent.children.push(this);
+		        		
+		        		this.selectcolor = Map.generateColor();
+						this.label = "New Node";
+						this.x = this.parent.x + this.parent.w/2 + this.label.length*5 + 50;
+						this.y = this.parent.y + Math.pow(-1,this.parent.children.length)*28*Math.floor(this.parent.children.length/2);
+
+		        		
+				    } else {
+				    	// initialize root node
+				    	
+				    	this.root = true;
+				    	this.parent = false;
+				    	
+				    	this.selectcolor = Map.generateColor();
+				    	this.label = "New Project";
+				    	this.x = 100;
+				    	this.y = 150;
+				    }
+
+				    this.w = this.label.length*10 + 20;
+				    this.h = 30;
+				    this.linew = 2;
+				    this.important = 0;
+				    this.urgent = 0;
+					this.select = false;
+					this.edit = false;
+					this.children = [];
+					
+					Map.nodes.push(this);
+					Map.setSelection(this);
+				}
+			}
+			
+			Map.Node.prototype.setLabel = function(newLabel) {
+				this.label = newLabel;
+			    this.w = this.label.length*10 + 20;
+			}
+			
+			Map.Node.prototype.nextSibling = function() {
+				if(this.root) return undefined;
+				
+				for (var i in this.parent.children) {
+					if(this === this.parent.children[i])
+						return this.parent.children[parseInt(i)+1];
+				}				
+			}
+			
+			Map.Node.prototype.draw = function(ctx) {
+				
+				if(this.root) {
+					
+					var decalage = 3;
+					
+					ctx.beginPath();
+			        ctx.moveTo(this.x-this.w/2, this.y)
+			        ctx.quadraticCurveTo(this.x-this.w/2, this.y+this.h/2, this.x, this.y+this.h/2);
+			        ctx.quadraticCurveTo(this.x+this.w/2, this.y+this.h/2, this.x+this.w/2, this.y);
+			        ctx.quadraticCurveTo(this.x+this.w/2, this.y-this.h/2, this.x, this.y-this.h/2);
+			        ctx.quadraticCurveTo(this.x-this.w/2, this.y-this.h/2, this.x-this.w/2, this.y);
+			        ctx.closePath();
+			        
+			       	ctx.strokeStyle = this.select ? this.selectcolor : "black";
+			        ctx.lineWidth = this.select ? 5 : this.linew;
+			        ctx.stroke();
+			        ctx.fillStyle = "white";
+		    	    ctx.fill();
+		    	   
+				} else {
+
+   					var decalage = -3;
+   					
+					ctx.beginPath();
+					
+					if(this.select) {
+						ctx.moveTo(this.x-(this.w/2-10), this.y);
+						ctx.lineTo(this.x+(this.w/2-10), this.y);
+						ctx.lineTo(this.x+(this.w/2-10), this.y-this.h/2);
+						ctx.lineTo(this.x-(this.w/2-10), this.y-this.h/2);
+						ctx.closePath()
+						ctx.fillStyle = Map.selectColor;
+						ctx.strokeStyle = Map.selectColor;
+						ctx.lineWidth = 1;
+						if(this.edit) ctx.stroke();
+						else ctx.fill();
+						
+						ctx.beginPath();
+					}
+					
+
+			        if(this.parent.root) {
+			        	ctx.moveTo(this.parent.x, this.parent.y);
+		                ctx.quadraticCurveTo(this.x-this.w/2-20, this.y-decalage, this.x-this.w/2, this.y-decalage);		                
+					} else {
+						ctx.moveTo(this.parent.x+this.parent.w/2, this.parent.y-decalage);
+						ctx.bezierCurveTo(this.parent.x+(this.parent.w/2+20),this.parent.y-decalage,this.x-(this.w/2+20),this.y-decalage,this.x-(this.w/2), this.y-decalage);
+					}
+					
+					ctx.lineTo(this.x+this.w/2, this.y-decalage);
+
+					ctx.strokeStyle = this.select ? this.selectcolor : "black";
+					ctx.lineWidth = this.select ? 4 : this.linew;
+			        ctx.stroke();
+			        ctx.closePath();
+				
+				}
+				
+				ctx.fillStyle = this.select ? "black" : "steelblue";
+		        ctx.font="10pt Lucida Console";
+		        ctx.textAlign = "center";
+		        ctx.fillText(this.label, this.x, this.y+decalage);
+		    
+		    }
+			
+			Map.Node.prototype.nextSibling = function() {
+				
+				if(this.root) return undefined;
+		    	
+		    	for(var i in this.parent.children) {
+		    		if(this === this.parent.children[i])
+	    				return this.parent.children[parseInt(i)+1];
+		    	}
+			}
+		</script>
+	</head>
+	<body>
+		
+		<div id="wrapper" style="cursor:pointer">	
+			<canvas id="board" width=900 height=700 style="margin:10px; border:2px solid black">
+		    	UPGRADE TO HTML5 YOU OLD BASTARD
+			</canvas>
+		</div>
+		<script>
+			var canvas = document.getElementById("board");  
+			var context = canvas.getContext('2d');
+			
+			canvas.addEventListener("mousedown", Map.click, false);
+			
+			canvas.addEventListener("mouseup", function(e) {
+				canvas.removeEventListener("mousemove", Map.mousemove, false);
+				Map.mouseup();
+			}, false);
+			
+			canvas.addEventListener("mouseout", function(e) {
+				canvas.removeEventListener("mousemove", Map.mousemove, false);
+				Map.mouseout();
+			}, false);
+
+			document.addEventListener("keydown", function(e) {
+				e.preventDefault();
+				Map.keypress(e);
+			}, false);
+			
+			zero = new Map.Node();
+			zero.setLabel("Root");
+			Map.draw();
+
+
+		</script>
+		
+		<footer>
+			<p>
+				&copy; Copyright  by Tout le monde
+			</p>
+		</footer>
+	</body>
+</html>

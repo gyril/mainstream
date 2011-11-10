@@ -105,6 +105,10 @@
 					var drag = Map.drag;
 					
 					while(drag) {
+
+						if(drag.parent.root && (drag.x - drag.parent.x)*(drag.orientation) <= 0)
+							drag.flipTree();
+
 						drag.x += nx;
 						drag.y += ny;
 						
@@ -211,6 +215,7 @@
 				    this.urgent = 0;
 					this.select = false;
 					this.edit = false;
+					this.orientation = 1; //1 == à droite de root, -1 == à gauche
 					this.children = [];
 					
 					Map.nodes.push(this);
@@ -219,19 +224,12 @@
 			}
 			
 			Map.Node.prototype.setLabel = function (newLabel) {
+				var previousLabel = this.label;
 				this.label = newLabel;
 			    this.w = this.label.length*10 + 20;
+			    this.x += 5*(newLabel.length - previousLabel.length);
 			}
-			
-			Map.Node.prototype.nextSibling = function () {
-				if(this.root) return undefined;
-				
-				for (var i in this.parent.children) {
-					if(this === this.parent.children[i])
-						return this.parent.children[parseInt(i)+1];
-				}				
-			}
-			
+					
 			Map.Node.prototype.draw = function (ctx) {
 				
 				if(this.root) {
@@ -276,13 +274,13 @@
 
 			        if(this.parent.root) {
 			        	ctx.moveTo(this.parent.x, this.parent.y);
-		                ctx.quadraticCurveTo(this.x-this.w/2-20, this.y-decalage, this.x-this.w/2, this.y-decalage);		                
+		                ctx.quadraticCurveTo(this.x-(this.w/2+20)*this.orientation, this.y-decalage, this.x-(this.w/2)*this.orientation, this.y-decalage);		                
 					} else {
-						ctx.moveTo(this.parent.x+this.parent.w/2, this.parent.y-decalage);
-						ctx.bezierCurveTo(this.parent.x+(this.parent.w/2+20),this.parent.y-decalage,this.x-(this.w/2+20),this.y-decalage,this.x-(this.w/2), this.y-decalage);
+						ctx.moveTo(this.parent.x+this.parent.w/2*this.orientation, this.parent.y-decalage);
+						ctx.bezierCurveTo(this.parent.x+(this.parent.w/2+20)*this.orientation,this.parent.y-decalage,this.x-(this.w/2+20)*this.orientation,this.y-decalage,this.x-(this.w/2)*this.orientation, this.y-decalage);
 					}
 					
-					ctx.lineTo(this.x+this.w/2, this.y-decalage);
+					ctx.lineTo(this.x+this.w/2*this.orientation, this.y-decalage);
 
 					ctx.strokeStyle = this.select ? this.selectcolor : "black";
 					ctx.lineWidth = this.select ? 4 : this.linew;
@@ -309,6 +307,9 @@
 			}
 			
 			Map.Node.prototype.dropNode = function () {
+				if(this.root)
+					return;
+					
 				var num = Map.nodes.indexOf(this);
 				Map.nodes.splice(num, 1);
 				for(i in this.children) {
@@ -318,10 +319,31 @@
 				}
 				num = this.parent.children.indexOf(this);
 				this.parent.children.splice(num, 1);
+				Map.setSelection(this.parent);
 				delete this;
 			}
 			
+			Map.Node.prototype.flipTree = function() {
+				var subroot = this;
+				var drag = this;
+				
+				while(drag) {
+					drag.orientation *= -1;
+					drag.x = 2*subroot.x - drag.x;
+					
+					if(drag.children.length) {
+						drag = drag.children[0];
+					} else {
+						while(drag.nextSibling()==undefined && drag != subroot)
+							drag = drag.parent;
+						drag = ( drag==subroot ) ? false : drag.nextSibling();
+					}
+				}
+			}
+			
 			Map.Node.prototype.getParent = function () {
+				if(this.root)
+					return this;
 				return this.parent;
 			}
 
